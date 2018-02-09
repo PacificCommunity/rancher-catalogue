@@ -1,0 +1,5 @@
+
+name: SPC Geonode
+description: A production ready customizable Geonode setup.
+maintainer: Olivier Dalang <olivierd@spc.int>
+projectURL: https://github.com/olivierdalang/SPCGeonode

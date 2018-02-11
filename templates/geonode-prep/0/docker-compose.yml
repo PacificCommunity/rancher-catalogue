@@ -35,7 +35,7 @@ services:
     
   # Celery worker that executes celery tasks created by Django.
   celery:
-    image: olivierdalang/spcgeonode:django-0.0.14
+    image: olivierdalang/spcgeonode-prep:0
     environment:
       - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
       - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}
@@ -66,7 +66,7 @@ services:
 
   # Celery camera that monitors celery tasks and populate the djcelery django admin interface
   celerycam:
-    image: olivierdalang/spcgeonode:django-0.0.14
+    image: olivierdalang/spcgeonode-prep:0
     environment:
       - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
       - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}

@@ -3,7 +3,7 @@ catalog:
   name: "SPC Geonode"
   description: "SPC Geonode"
   version: "0"
-  uuid: spc-geonode-0
+  uuid: spc-geonode-prep-0
   questions:
     - variable: WAN_HOST
       label: "Hostname for WAN access"

@@ -6,7 +6,7 @@ services:
 
   # Our custom django application. It includes Geonode.
   django:
-    image: olivierdalang/spcgeonode-prep:0
+    image: olivierdalang/spcgeonode-prep:prep-2
     environment:
       - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
       - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}
@@ -37,7 +37,7 @@ services:
     
   # Celery worker that executes celery tasks created by Django.
   celery:
-    image: olivierdalang/spcgeonode-prep:0
+    image: olivierdalang/spcgeonode-prep:prep-2
     environment:
       - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
       - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}
@@ -68,7 +68,7 @@ services:
 
   # Celery camera that monitors celery tasks and populate the djcelery django admin interface
   celerycam:
-    image: olivierdalang/spcgeonode-prep:0
+    image: olivierdalang/spcgeonode-prep:prep-2
     environment:
       - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
       - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}

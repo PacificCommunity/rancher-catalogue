@@ -103,6 +103,7 @@ services:
     environment:
       - WAN_HOST=${WAN_HOST}
       - LAN_HOST=${LAN_HOST}
+      - LETSENCRYPT_MODE=${LETSENCRYPT_MODE}
       - RESOLVER=169.254.169.250
     ports:
       - "80:80"

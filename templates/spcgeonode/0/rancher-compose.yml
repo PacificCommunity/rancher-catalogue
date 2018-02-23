@@ -22,6 +22,21 @@ catalog:
       description: "This will be used as contact information for Let's Encrypt certificates and as email for the superuser"
       required: true
       type: "string"
+    - variable: REGISTRATION_OPEN
+      label: "Geonode registration open"
+      description: "Geonode setting to enable or disable new user self registration."
+      required: true
+      default: "True"
+      type: enum
+      options:
+        - "True"
+        - "False"
+    - variable: TIME_ZONE
+      label: "Time zone"
+      description: "Time zone setting for django"
+      required: true
+      default: "Pacific/Fiji"
+      type: "string"
     - variable: LETSENCRYPT_MODE
       label: "Let's Encrypt Mode"
       description: "Let's Encrypt has very conservative limits as to failed attemps, so you can very quickly hit the limits when doing tests. This is annoying, as if you hit the limit, it may take a few days before you can actually get a valid certificate. Set mode to *disabled* to disable getting certificates from LetsEncrypt alltogether or *staging* to use LetsEncrypt tests certificates (not valid, but with much higher limits)."

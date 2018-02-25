@@ -1,28 +1,19 @@
 version: '2'
 
 # TODO : replace olivierdalang repository by pacificcommunity
+# TODO : put environment variables that are not supposed to be changed in the dockerfiles
     
 services:
 
   # Our custom django application. It includes Geonode.
   django:
-    image: olivierdalang/spcgeonode-prep:prep-2
+    image: olivierdalang/spcgeonode:django-prep-latest
     environment:
-      - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
-      - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}
+      - ALLOWED_HOSTS=${HTTPS_HOST},${HTTP_HOST}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - DJANGO_SETTINGS_MODULE=spcgeonode.settings
       - DEBUG=False
-      - REGISTRATION_OPEN=True
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
-      - BROKER_URL=amqp://guest:guest@rabbitmq:5672/
-      - STATIC_ROOT=/spcgeonode-static/
-      - MEDIA_ROOT=/spcgeonode-media/
-      - STATIC_URL=/static/
-      - MEDIA_URL=/media/
-      - GEOSERVER_LOCATION=http://nginx/geoserver/
-      - C_FORCE_ROOT=1 # TODO : understand that (is it a security concern ?)
-      - TIME_ZONE=Pacific/Fiji
+      - REGISTRATION_OPEN=${REGISTRATION_OPEN}
+      - TIME_ZONE=${TIME_ZONE}
     volumes:
       - static:/spcgeonode-static/
       - media:/spcgeonode-media/
@@ -37,23 +28,13 @@ services:
     
   # Celery worker that executes celery tasks created by Django.
   celery:
-    image: olivierdalang/spcgeonode-prep:prep-2
+    image: olivierdalang/spcgeonode:django-prep-latest
     environment:
-      - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
-      - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}
+      - ALLOWED_HOSTS=${HTTPS_HOST},${HTTP_HOST}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - DJANGO_SETTINGS_MODULE=spcgeonode.settings
       - DEBUG=False
-      - REGISTRATION_OPEN=True
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
-      - BROKER_URL=amqp://guest:guest@rabbitmq:5672/
-      - STATIC_ROOT=/spcgeonode-static/
-      - MEDIA_ROOT=/spcgeonode-media/
-      - STATIC_URL=/static/
-      - MEDIA_URL=/media/
-      - GEOSERVER_LOCATION=http://nginx/geoserver/
-      - C_FORCE_ROOT=1 # TODO : understand that (is it a security concern ?)
-      - TIME_ZONE=Pacific/Fiji
+      - REGISTRATION_OPEN=${REGISTRATION_OPEN}
+      - TIME_ZONE=${TIME_ZONE}
     volumes:
       - static:/spcgeonode-static/
       - media:/spcgeonode-media/
@@ -68,23 +49,13 @@ services:
 
   # Celery camera that monitors celery tasks and populate the djcelery django admin interface
   celerycam:
-    image: olivierdalang/spcgeonode-prep:prep-2
+    image: olivierdalang/spcgeonode:django-prep-latest
     environment:
-      - GEOSERVER_PUBLIC_LOCATION=/geoserver/ # we use a relative URL since we want to keep current scheme/host
-      - ALLOWED_HOSTS=${WAN_HOST},${LAN_HOST}
+      - ALLOWED_HOSTS=${HTTPS_HOST},${HTTP_HOST}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - DJANGO_SETTINGS_MODULE=spcgeonode.settings
       - DEBUG=False
-      - REGISTRATION_OPEN=True
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
-      - BROKER_URL=amqp://guest:guest@rabbitmq:5672/
-      - STATIC_ROOT=/spcgeonode-static/
-      - MEDIA_ROOT=/spcgeonode-media/
-      - STATIC_URL=/static/
-      - MEDIA_URL=/media/
-      - GEOSERVER_LOCATION=http://nginx/geoserver/
-      - C_FORCE_ROOT=1 # TODO : understand that (is it a security concern ?)
-      - TIME_ZONE=Pacific/Fiji
+      - REGISTRATION_OPEN=${REGISTRATION_OPEN}
+      - TIME_ZONE=${TIME_ZONE}
     volumes:
       - static:/spcgeonode-static/
       - media:/spcgeonode-media/
@@ -99,10 +70,11 @@ services:
   
   # Nginx is serving django static and media files and proxies to django and geonode
   nginx:
-    image: olivierdalang/spcgeonode:nginx-0.0.15
+    image: olivierdalang/spcgeonode:nginx-0.0.18
     environment:
-      - WAN_HOST=${WAN_HOST}
-      - LAN_HOST=${LAN_HOST}
+      - HTTPS_HOST=${HTTPS_HOST}
+      - HTTP_HOST=${HTTP_HOST}
+      - LETSENCRYPT_MODE=${LETSENCRYPT_MODE}
       - RESOLVER=169.254.169.250
     ports:
       - "80:80"
@@ -110,17 +82,14 @@ services:
     volumes:
       - static:/spcgeonode-static/
       - media:/spcgeonode-media/
-      - certbot:/spcgeonode-certbot/
+      - certificates:/spcgeonode-certificates/
     restart: on-failure
     labels:
       io.rancher.container.pull_image: always
 
   # Geoserver backend
   geoserver:
-    image: olivierdalang/spcgeonode:geoserver-0.0.15
-    environment:
-     - GEOSERVER_HOME=/geoserver-2.12.1
-     - GEOSERVER_DATA_DIR=/spcgeonode-geodatadir
+    image: olivierdalang/spcgeonode:geoserver-0.0.18
     volumes:
       - geodatadir:/spcgeonode-geodatadir/
     secrets:
@@ -132,20 +101,20 @@ services:
 
   # Gets and installs letsencrypt certificates
   letsencrypt:
-    image: olivierdalang/spcgeonode:letsencrypt-0.0.15
+    image: olivierdalang/spcgeonode:letsencrypt-0.0.18
     environment:
-      - WAN_HOST=${WAN_HOST}
-      - LAN_HOST=${LAN_HOST}
+      - HTTPS_HOST=${HTTPS_HOST}
+      - HTTP_HOST=${HTTP_HOST}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - LETSENCRYPT_MODE=${LETSENCRYPT_MODE}
     volumes:
-      - certbot:/spcgeonode-certbot/
+      - certificates:/spcgeonode-certificates/
     restart: on-failure
     labels:
       io.rancher.container.pull_image: always
    
   pgdumper:
-    image: olivierdalang/spcgeonode:pgdumper-0.0.15
+    image: olivierdalang/spcgeonode:pgdumper-0.0.18
     volumes:
       - pgdumps:/spcgeonode-pgdumps/ 
     restart: on-failure
@@ -153,7 +122,7 @@ services:
       io.rancher.container.pull_image: always
 
   syncthing:
-    image: olivierdalang/spcgeonode:syncthing-0.0.15
+    image: olivierdalang/spcgeonode:syncthing-0.0.18
     environment:
       - REMOTE_SYNCTHING_MACHINE_ID=${REMOTE_SYNCTHING_MACHINE_ID}
     secrets:
@@ -171,7 +140,7 @@ services:
       io.rancher.container.pull_image: always
 
   rclone:
-    image: olivierdalang/spcgeonode:rclone-0.0.15
+    image: olivierdalang/spcgeonode:rclone-0.0.18
     environment:
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
       - AWS_BUCKET_REGION=${AWS_BUCKET_REGION}
@@ -200,7 +169,7 @@ services:
 
   # Vanilla RabbitMQ service. This is needed by celery
   rabbitmq:
-    image: rabbitmq:3.7 
+    image: rabbitmq:3.7-alpine 
     restart: on-failure
 
 volumes:
@@ -208,7 +177,7 @@ volumes:
   media:
   database:
   geodatadir:
-  certbot:
+  certificates:
   pgdumps:
 
 secrets:

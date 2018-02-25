@@ -5,14 +5,14 @@ catalog:
   version: "0 (dev)"
   uuid: spc-geonode-0
   questions:
-    - variable: WAN_HOST
-      label: "Hostname for WAN access"
+    - variable: HTTPS_HOST
+      label: "Hostname for HTTPS access"
       description: "Enter the domain name you will be using. This will setup SSL certificates and configure Nginx to accept connections on this domain name. Leave this empty if you only plan to use Geonode on LAN. If you have no domain name, but still want to test encryption, you can use xip.io : X.X.X.X.xip.io (replace X.X.X.X by the IP)."
       required: false
       default: null
       type: "string"
-    - variable: LAN_HOST
-      label: "Hostname for LAN access"
+    - variable: HTTP_HOST
+      label: "Hostname for HTTP access"
       description: "Enter the hostname name you will be using (most likely a LAN IP). This will configure Nginx to accept unencrypted connections on this domain name. Leave this empty if you only plan to use Geonode on WAN."
       required: false
       default: null
